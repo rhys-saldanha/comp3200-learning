@@ -2,9 +2,9 @@ import tensorflow as tf
 
 # Just wild type
 
-alpha = tf.Variable([602.83564367], dtype=tf.float64)
-a = tf.Variable([181784.02022971], dtype=tf.float64)
-b = tf.Variable([61808.97738014], dtype=tf.float64)
+alpha = tf.Variable([29931.0184531], dtype=tf.float64)
+a = tf.Variable([179722.16846192], dtype=tf.float64)
+b = tf.Variable([59989.11770581], dtype=tf.float64)
 
 c = tf.placeholder(dtype=tf.float64)
 X = tf.placeholder(dtype=tf.float64)
@@ -24,7 +24,7 @@ model = tf.multiply(tf.div(alpha, death), tf.add(T, tf.div(tf.exp(-tf.multiply(d
 squared_deltas = tf.square(model - X)
 loss = tf.reduce_sum(squared_deltas)
 
-optimiser = tf.train.AdamOptimizer(epsilon=0.1)
+optimiser = tf.train.MomentumOptimizer(.001, 0.0001)
 train = optimiser.minimize(loss=loss)
 
 init = tf.global_variables_initializer()
@@ -39,14 +39,15 @@ with tf.Session() as sess:
     target = 1e-20
     n = 0
 
-    while past != curr and n < 10 ** 6 and error > target:
-        # Loop till variables are unchanged or 10**6 iterations have been done or loss is small enough
+    while past != curr and error > target:
+        # Loop till variables are unchanged or loss is small enough
         past = curr
         sess.run(train, feed_dict={c: c_train, X: X_train})
         curr = sess.run([alpha, a, b], {c: c_train, X: X_train})
         error = sess.run(loss, {c: c_train, X: X_train})
         n += 1
         if n % 10**4 == 0:
+            n = 0
             print('alpha:{}, a:{}, b:{}, loss:{}'.format(curr[0], curr[1], curr[2], error))
 
     curr_alpha, curr_a, curr_b, curr_loss = sess.run([alpha, a, b, loss], {c: c_train, X: X_train})
