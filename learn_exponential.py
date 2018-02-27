@@ -1,8 +1,5 @@
 import argparse
-import math
 import os
-
-
 
 parser = argparse.ArgumentParser()
 
@@ -49,6 +46,7 @@ with tf.device('/cpu:0'):
     loss = tf.reduce_sum(squared_deltas)
 
     optimiser = tf.train.MomentumOptimizer(1, .5, use_nesterov=args.nesterov)
+    # optimiser = tf.train.MomentumOptimizer(.1, .9, use_nesterov=args.nesterov)
     train = optimiser.minimize(loss=loss)
 
     init = tf.global_variables_initializer()
