@@ -2,17 +2,22 @@ import argparse
 import math
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-import tensorflow as tf
 
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--alpha', type=float, default=3579)
 parser.add_argument('--a', type=float, default=16764)
 parser.add_argument('--b', type=float, default=2688)
+parser.add_argument('--cuda', type=bool, default=False)
+parser.add_argument('--nesterov', type=bool, default=True)
 
 args = parser.parse_args()
+
+if not args.cuda:
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
+import tensorflow as tf
 
 with tf.device('/cpu:0'):
     # with tf.device('/device:gpu:0'):
@@ -26,6 +31,7 @@ with tf.device('/cpu:0'):
     # alpha: 2955.356560847476,  a: 13840.462801104484, b: 2219.4832443860337, loss: 44814.461528813496
     # alpha: 3020.3095022586476, a: 14144.649042933394, b: 2268.263133434123,  loss: 44814.46152881349
     # alpha: 3579.5837662089357, a: 16763.83045037323,  b: 2688.280086480899,  loss: 44814.46152881349
+    # alpha: 72502.02504701687,  a: 339539.9501363504,  b: 54449.277595662934, loss: 44814.461528813525
 
     alpha = tf.Variable(args.alpha, dtype=tf.float64)
     a = tf.Variable(args.a, dtype=tf.float64)
@@ -42,7 +48,7 @@ with tf.device('/cpu:0'):
     squared_deltas = tf.square(model - X)
     loss = tf.reduce_sum(squared_deltas)
 
-    optimiser = tf.train.MomentumOptimizer(1, .5, use_nesterov=True)
+    optimiser = tf.train.MomentumOptimizer(1, .5, use_nesterov=args.nesterov)
     train = optimiser.minimize(loss=loss)
 
     init = tf.global_variables_initializer()
