@@ -8,9 +8,9 @@ import tensorflow as tf
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--alpha', type=float, default=889)
-parser.add_argument('--a', type=float, default=4164)
-parser.add_argument('--b', type=float, default=667)
+parser.add_argument('--alpha', type=float, default=3579)
+parser.add_argument('--a', type=float, default=16764)
+parser.add_argument('--b', type=float, default=2688)
 
 args = parser.parse_args()
 
@@ -22,8 +22,10 @@ with tf.device('/cpu:0'):
     # alpha: 889.2980868261652, a: 4164.7414410585925,  b: 667.8660128354211,   loss: 619784.3227130426
     # alpha: 3579.692612228826, a: 16764.340195841032,  b: 2688.361829989068,   loss: 619784.3227130463
 
-    # alpha: 2955.356560847476, a: 13840.462801104484, b: 2219.4832443860337, loss: 44814.461528813496
-    # alpha: 3020.3095022586476, a: 14144.649042933394, b: 2268.263133434123, loss: 44814.46152881349
+    # avg data
+    # alpha: 2955.356560847476,  a: 13840.462801104484, b: 2219.4832443860337, loss: 44814.461528813496
+    # alpha: 3020.3095022586476, a: 14144.649042933394, b: 2268.263133434123,  loss: 44814.46152881349
+    # alpha: 3579.5837662089357, a: 16763.83045037323,  b: 2688.280086480899,  loss: 44814.46152881349
 
     alpha = tf.Variable(args.alpha, dtype=tf.float64)
     a = tf.Variable(args.a, dtype=tf.float64)
