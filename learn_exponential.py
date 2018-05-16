@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 
 parser = argparse.ArgumentParser()
 
@@ -19,17 +20,17 @@ else:
 
 import tensorflow as tf
 
-# alpha = tf.Variable(args.alpha, dtype=tf.double)
-alpha = tf.constant(20, dtype=tf.double)
-a = tf.Variable(args.a, dtype=tf.double)
-b = tf.Variable(args.b, dtype=tf.double)
+alpha = tf.Variable(args.alpha, dtype=tf.double, name='alpha')
+# alpha = tf.constant(20, dtype=tf.double, name='alpha')
+a = tf.Variable(args.a, dtype=tf.double, name='a')
+b = tf.Variable(args.b, dtype=tf.double, name='b')
 
-c = tf.placeholder(dtype=tf.double)
-X = tf.placeholder(dtype=tf.double)
+c = tf.placeholder(dtype=tf.double, name='c')
+X = tf.placeholder(dtype=tf.double, name='X')
 
-T = tf.constant(1800, dtype=tf.double)
+T = tf.constant(1800, dtype=tf.double, name='T')
 
-death = tf.add(a, tf.multiply(b, c))
+death = tf.add(a, tf.multiply(b, c), name='k')
 model = tf.multiply(tf.div(alpha, death), tf.add(T, tf.div(tf.exp(-tf.multiply(death, T)) - 1.0, death)), name='model')
 
 squared_deltas = tf.square(model - X)
@@ -57,8 +58,8 @@ with open('data_wt_avg_short.csv', 'r') as f:
         c_train += c_values
         X_train += line.strip().split(',')
 
-c_train = list(map(lambda x: float(x), c_train))
-X_train = list(map(lambda x: float(x), X_train))
+c_train = list(map(float, c_train))
+X_train = list(map(float, X_train))
 
 # print(c_train, '\n', X_train)
 # print(len(c_train), '\n', len(X_train))
@@ -68,6 +69,7 @@ tf_config = tf.ConfigProto(allow_soft_placement=False)
 if __name__ == '__main__':
     print('start')
     with tf.Session(config=tf_config) as sess:
+        writer = tf.summary.FileWriter('/tmp/log/', sess.graph)
         sess.run(init)
 
         # curr_error = 1
@@ -91,4 +93,5 @@ if __name__ == '__main__':
             pass
         finally:
             curr_alpha, curr_a, curr_b, curr_loss = sess.run([alpha, a, b, loss], {c: c_train, X: X_train})
-            print('alpha:{}, a:{}, b:{}, loss:{}'.format(curr_alpha, curr_a, curr_b, curr_loss))
+            print('\nalpha:{}, a:{}, b:{}, loss:{}'.format(curr_alpha, curr_a, curr_b, curr_loss))
+            writer.close()
